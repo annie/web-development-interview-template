@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CellData, CellSyncState } from "./apiClient";
 
 type CellProps = {
@@ -6,7 +6,7 @@ type CellProps = {
   index: number;
   syncState: CellSyncState;
   onDelete: (cellId: string) => void;
-  onTextChange: (cellId: string, text: string) => void;
+  onSave: (cellId: string, text: string) => void;
 };
 
 export function Cell({
@@ -14,9 +14,16 @@ export function Cell({
   index,
   syncState,
   onDelete,
-  onTextChange,
+  onSave,
 }: CellProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [draftText, setDraftText] = useState(cell.text);
+
+  useEffect(() => {
+    setDraftText(cell.text);
+  }, [cell.text]);
+
+  const hasUnsavedChanges = draftText !== cell.text;
 
   return (
     <div className="cell">
@@ -35,6 +42,14 @@ export function Cell({
           ) : null}
           <div className="cell-controls">
             <button
+              className="cell-button"
+              type="button"
+              disabled={!hasUnsavedChanges || syncState === "saving"}
+              onClick={() => onSave(cell.id, draftText)}
+            >
+              Save
+            </button>
+            <button
               className="cell-button cell-button-danger"
               type="button"
               onClick={() => onDelete(cell.id)}
@@ -49,8 +64,8 @@ export function Cell({
           ref={textareaRef}
           aria-label={`Cell ${index + 1}`}
           className="cell-input"
-          value={cell.text}
-          onChange={(e) => onTextChange(cell.id, e.target.value)}
+          value={draftText}
+          onChange={(e) => setDraftText(e.target.value)}
           spellCheck={false}
         />
       </div>

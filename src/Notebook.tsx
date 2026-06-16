@@ -1,5 +1,4 @@
-import { debounce } from "lodash";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SERVER, type CellData, type CellSyncState } from "./apiClient";
 import { Cell } from "./Cell";
 import { v4 as uuid } from "uuid";
@@ -69,35 +68,26 @@ export function Notebook() {
     [updateCellState]
   );
 
-  const saveCellsDebounced = useMemo(
-    () => debounce(saveCells, 500),
-    [saveCells]
-  );
+  const applyRemoteCells = useCallback((remoteCells: CellData[]) => {
+    setCells(remoteCells);
+    setCellSyncStates((currentStates) => {
+      const nextStates = { ...currentStates };
 
-  const applyRemoteCells = useCallback(
-    (remoteCells: CellData[]) => {
-      saveCellsDebounced.cancel();
-      setCells(remoteCells);
-      setCellSyncStates((currentStates) => {
-        const nextStates = { ...currentStates };
-
-        for (const id of Object.keys(nextStates)) {
-          if (!remoteCells.some((cell) => cell.id === id)) {
-            delete nextStates[id];
-          }
+      for (const id of Object.keys(nextStates)) {
+        if (!remoteCells.some((cell) => cell.id === id)) {
+          delete nextStates[id];
         }
+      }
 
-        for (const cell of remoteCells) {
-          if (!nextStates[cell.id]) {
-            nextStates[cell.id] = "idle";
-          }
+      for (const cell of remoteCells) {
+        if (!nextStates[cell.id]) {
+          nextStates[cell.id] = "idle";
         }
+      }
 
-        return nextStates;
-      });
-    },
-    [saveCellsDebounced]
-  );
+      return nextStates;
+    });
+  }, []);
 
   useEffect(() => {
     if (loadState !== "ready") {
@@ -117,19 +107,17 @@ export function Notebook() {
     });
   }, [saveCells]);
 
-  const updateCellText = useCallback(
+  const saveCellText = useCallback(
     (cellId: string, text: string) => {
-      updateCellState(cellId, "saving");
       setCells((cells) => {
         const newCells = cells.map((cell) =>
           cell.id === cellId ? { ...cell, text } : cell
         );
-        saveCellsDebounced(newCells, cellId);
+        void saveCells(newCells, cellId);
         return newCells;
       });
-      updateCellState(cellId, "idle");
     },
-    [saveCellsDebounced]
+    [saveCells]
   );
 
   const deleteCell = useCallback(
@@ -168,7 +156,7 @@ export function Notebook() {
                   index={index}
                   syncState={cellSyncStates[cell.id] ?? "idle"}
                   onDelete={deleteCell}
-                  onTextChange={updateCellText}
+                  onSave={saveCellText}
                 />
               ))
             )}

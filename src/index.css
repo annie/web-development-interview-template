@@ -226,6 +226,11 @@ body {
   border-color: #a5b4fc;
 }
 
+.cell-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .cell-button-danger {
   color: #b42318;
 }
