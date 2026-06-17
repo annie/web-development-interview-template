@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { CellData } from "./apiClient";
 
 type CellProps = {
@@ -9,7 +9,6 @@ type CellProps = {
 };
 
 export function Cell({ cell, index, onDelete, onSave }: CellProps) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [draftText, setDraftText] = useState(cell.text);
 
   useEffect(() => {
@@ -44,7 +43,6 @@ export function Cell({ cell, index, onDelete, onSave }: CellProps) {
       </div>
       <div className="cell-editor">
         <textarea
-          ref={textareaRef}
           aria-label={`Cell ${index + 1}`}
           className="cell-input"
           value={draftText}

@@ -27,14 +27,6 @@ export function Notebook() {
     void loadCells();
   }, [loadCells]);
 
-  const saveCells = useCallback(async (newCells: CellData[]) => {
-    try {
-      await SERVER.updateCells(newCells, clientId.current);
-    } catch (e) {
-      console.error(`Failed to save cells: ${e}`);
-    }
-  }, []);
-
   const applyRemoteCells = useCallback((remoteCells: CellData[]) => {
     setCells(remoteCells);
   }, []);
@@ -43,38 +35,36 @@ export function Notebook() {
     return SERVER.subscribeToCellUpdates(clientId.current, applyRemoteCells);
   }, [applyRemoteCells]);
 
-  const addCell = useCallback(() => {
-    const newCell = createCell();
+  const saveCells = useCallback(async (newCells: CellData[]) => {
+    try {
+      setCells(newCells);
+      await SERVER.updateCells(newCells, clientId.current);
+    } catch (e) {
+      console.error(`Failed to save cells: ${e}`);
+    }
+  }, []);
 
-    setCells((cells) => {
-      const newCells = [...cells, newCell];
-      void saveCells(newCells);
-      return newCells;
-    });
-  }, [saveCells]);
+  const addCell = useCallback(() => {
+    const newCells = [...cells, createCell()];
+    void saveCells(newCells);
+  }, [cells, saveCells]);
 
   const saveCellText = useCallback(
     (cellId: string, text: string) => {
-      setCells((cells) => {
-        const newCells = cells.map((cell) =>
-          cell.id === cellId ? { ...cell, text } : cell
-        );
-        void saveCells(newCells);
-        return newCells;
-      });
+      const newCells = cells.map((cell) =>
+        cell.id === cellId ? { ...cell, text } : cell
+      );
+      void saveCells(newCells);
     },
-    [saveCells]
+    [cells, saveCells]
   );
 
   const deleteCell = useCallback(
     (cellId: string) => {
-      setCells((cells) => {
-        const newCells = cells.filter((cell) => cell.id !== cellId);
-        void saveCells(newCells);
-        return newCells;
-      });
+      const newCells = cells.filter((cell) => cell.id !== cellId);
+      void saveCells(newCells);
     },
-    [saveCells]
+    [cells, saveCells]
   );
 
   return (

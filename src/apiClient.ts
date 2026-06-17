@@ -28,7 +28,7 @@ export const SERVER: ServerApi = {
   },
 
   async updateCells(newCells, clientId) {
-    const response = await fetch("/api/cells", {
+    const response = await fetch("/api/cells/update", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export const SERVER: ServerApi = {
 
   subscribeToCellUpdates(clientId, onUpdate) {
     const eventSource = new EventSource(
-      `/api/cells/events?clientId=${encodeURIComponent(clientId)}`
+      `/api/cells/subscribe?clientId=${encodeURIComponent(clientId)}`
     );
 
     eventSource.addEventListener("cellsUpdated", (event) => {

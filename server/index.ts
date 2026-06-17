@@ -36,7 +36,7 @@ app.get("/api/cells", async (_req, res) => {
   }
 });
 
-app.get("/api/cells/events", (req, res) => {
+app.get("/api/cells/subscribe", (req, res) => {
   const clientId = req.query.clientId;
 
   if (typeof clientId !== "string" || clientId.length === 0) {
@@ -51,7 +51,7 @@ app.get("/api/cells/events", (req, res) => {
   });
 });
 
-app.put("/api/cells", async (req, res) => {
+app.put("/api/cells/update", async (req, res) => {
   if (!isCellDataArray(req.body)) {
     res.status(400).json({ error: "Invalid cells payload" });
     return;
