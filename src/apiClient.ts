@@ -3,8 +3,6 @@ export interface CellData {
   text: string;
 }
 
-export type CellSyncState = "idle" | "saving" | "error";
-
 export interface ServerApi {
   getCells: () => Promise<CellData[]>;
   updateCells: (newCells: CellData[], clientId: string) => Promise<void>;

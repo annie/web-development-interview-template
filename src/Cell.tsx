@@ -1,21 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import type { CellData, CellSyncState } from "./apiClient";
+import type { CellData } from "./apiClient";
 
 type CellProps = {
   cell: CellData;
   index: number;
-  syncState: CellSyncState;
   onDelete: (cellId: string) => void;
   onSave: (cellId: string, text: string) => void;
 };
 
-export function Cell({
-  cell,
-  index,
-  syncState,
-  onDelete,
-  onSave,
-}: CellProps) {
+export function Cell({ cell, index, onDelete, onSave }: CellProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [draftText, setDraftText] = useState(cell.text);
 
@@ -30,21 +23,11 @@ export function Cell({
       <div className="cell-header">
         <div className="cell-label">Cell {index + 1}</div>
         <div className="cell-header-end">
-          {syncState === "saving" ? (
-            <div className="cell-status" role="status">
-              <span className="cell-spinner" aria-hidden="true" />
-              Saving
-            </div>
-          ) : syncState === "error" ? (
-            <div className="cell-status cell-status-error" role="alert">
-              Save failed
-            </div>
-          ) : null}
           <div className="cell-controls">
             <button
               className="cell-button"
               type="button"
-              disabled={!hasUnsavedChanges || syncState === "saving"}
+              disabled={!hasUnsavedChanges}
               onClick={() => onSave(cell.id, draftText)}
             >
               Save

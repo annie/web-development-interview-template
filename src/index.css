@@ -132,11 +132,6 @@ body {
   font-size: 13px;
 }
 
-.notebook-placeholder-error {
-  border-color: #b42318;
-  color: #b42318;
-}
-
 .notebook-add-cell {
   display: flex;
   justify-content: flex-start;
@@ -174,35 +169,6 @@ body {
   align-items: center;
   gap: 12px;
   margin-left: auto;
-}
-
-.cell-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  line-height: 1;
-  color: #64748b;
-  white-space: nowrap;
-}
-
-.cell-status-error {
-  color: #b42318;
-}
-
-.cell-spinner {
-  width: 12px;
-  height: 12px;
-  border: 2px solid #cbd5e1;
-  border-top-color: #64748b;
-  border-radius: 50%;
-  animation: cell-spin 0.6s linear infinite;
-}
-
-@keyframes cell-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .cell-controls {

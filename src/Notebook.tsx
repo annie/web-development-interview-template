@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { SERVER, type CellData, type CellSyncState } from "./apiClient";
+import { SERVER, type CellData } from "./apiClient";
 import { Cell } from "./Cell";
 import { v4 as uuid } from "uuid";
-
-type LoadState = "loading" | "ready" | "error";
 
 function createCell(): CellData {
   return {
@@ -15,26 +13,13 @@ function createCell(): CellData {
 export function Notebook() {
   const clientId = useRef(uuid());
   const [cells, setCells] = useState<CellData[]>([]);
-  const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [cellSyncStates, setCellSyncStates] = useState<
-    Record<string, CellSyncState>
-  >({});
-  const [error, setError] = useState<string | null>(null);
 
   const loadCells = useCallback(async () => {
-    setLoadState("loading");
-    setError(null);
-
     try {
       const loadedCells = await SERVER.getCells();
       setCells(loadedCells);
-      setCellSyncStates(
-        Object.fromEntries(loadedCells.map((cell) => [cell.id, "idle"]))
-      );
-      setLoadState("ready");
-    } catch {
-      setLoadState("error");
-      setError("Failed to load notebook cells.");
+    } catch (e) {
+      console.error(`Failed to load cells: ${e}`);
     }
   }, []);
 
@@ -42,67 +27,28 @@ export function Notebook() {
     void loadCells();
   }, [loadCells]);
 
-  const updateCellState = useCallback(
-    (cellId: string, state: CellSyncState) => {
-      setCellSyncStates((currentStates) => {
-        const nextStates = { ...currentStates };
-        nextStates[cellId] = state;
-        return nextStates;
-      });
-    },
-    []
-  );
-
-  const saveCells = useCallback(
-    async (newCells: CellData[], updatingCellId: string) => {
-      updateCellState(updatingCellId, "saving");
-
-      try {
-        await SERVER.updateCells(newCells, clientId.current);
-        updateCellState(updatingCellId, "idle");
-      } catch (e) {
-        console.error(`Failed to save cells: ${e}`);
-        updateCellState(updatingCellId, "error");
-      }
-    },
-    [updateCellState]
-  );
+  const saveCells = useCallback(async (newCells: CellData[]) => {
+    try {
+      await SERVER.updateCells(newCells, clientId.current);
+    } catch (e) {
+      console.error(`Failed to save cells: ${e}`);
+    }
+  }, []);
 
   const applyRemoteCells = useCallback((remoteCells: CellData[]) => {
     setCells(remoteCells);
-    setCellSyncStates((currentStates) => {
-      const nextStates = { ...currentStates };
-
-      for (const id of Object.keys(nextStates)) {
-        if (!remoteCells.some((cell) => cell.id === id)) {
-          delete nextStates[id];
-        }
-      }
-
-      for (const cell of remoteCells) {
-        if (!nextStates[cell.id]) {
-          nextStates[cell.id] = "idle";
-        }
-      }
-
-      return nextStates;
-    });
   }, []);
 
   useEffect(() => {
-    if (loadState !== "ready") {
-      return;
-    }
-
     return SERVER.subscribeToCellUpdates(clientId.current, applyRemoteCells);
-  }, [loadState, applyRemoteCells]);
+  }, [applyRemoteCells]);
 
   const addCell = useCallback(() => {
     const newCell = createCell();
 
     setCells((cells) => {
       const newCells = [...cells, newCell];
-      void saveCells(newCells, newCell.id);
+      void saveCells(newCells);
       return newCells;
     });
   }, [saveCells]);
@@ -113,7 +59,7 @@ export function Notebook() {
         const newCells = cells.map((cell) =>
           cell.id === cellId ? { ...cell, text } : cell
         );
-        void saveCells(newCells, cellId);
+        void saveCells(newCells);
         return newCells;
       });
     },
@@ -124,7 +70,7 @@ export function Notebook() {
     (cellId: string) => {
       setCells((cells) => {
         const newCells = cells.filter((cell) => cell.id !== cellId);
-        void saveCells(newCells, cellId);
+        void saveCells(newCells);
         return newCells;
       });
     },
@@ -138,39 +84,24 @@ export function Notebook() {
       </header>
 
       <div className="notebook-body">
-        {loadState === "loading" ? (
-          <div className="notebook-placeholder">Loading…</div>
-        ) : loadState === "error" ? (
-          <div className="notebook-placeholder notebook-placeholder-error">
-            {error}
-          </div>
-        ) : loadState === "ready" ? (
-          <>
-            {cells.length === 0 ? (
-              <div className="notebook-placeholder">No cells</div>
-            ) : (
-              cells.map((cell, index) => (
-                <Cell
-                  key={cell.id}
-                  cell={cell}
-                  index={index}
-                  syncState={cellSyncStates[cell.id] ?? "idle"}
-                  onDelete={deleteCell}
-                  onSave={saveCellText}
-                />
-              ))
-            )}
-            <div className="notebook-add-cell">
-              <button
-                className="notebook-button"
-                type="button"
-                onClick={addCell}
-              >
-                Add cell
-              </button>
-            </div>
-          </>
-        ) : null}
+        {cells.length === 0 ? (
+          <div className="notebook-placeholder">No cells</div>
+        ) : (
+          cells.map((cell, index) => (
+            <Cell
+              key={cell.id}
+              cell={cell}
+              index={index}
+              onDelete={deleteCell}
+              onSave={saveCellText}
+            />
+          ))
+        )}
+        <div className="notebook-add-cell">
+          <button className="notebook-button" type="button" onClick={addCell}>
+            Add cell
+          </button>
+        </div>
       </div>
     </div>
   );
