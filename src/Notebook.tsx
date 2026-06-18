@@ -27,13 +27,9 @@ export function Notebook() {
     void loadCells();
   }, [loadCells]);
 
-  const applyRemoteCells = useCallback((remoteCells: CellData[]) => {
-    setCells(remoteCells);
-  }, []);
-
   useEffect(() => {
-    return SERVER.subscribeToCellUpdates(clientId.current, applyRemoteCells);
-  }, [applyRemoteCells]);
+    return SERVER.subscribeToCellUpdates(clientId.current, (cellsFromServer) => setCells(cellsFromServer));
+  }, [setCells]);
 
   const saveCells = useCallback(async (newCells: CellData[]) => {
     try {

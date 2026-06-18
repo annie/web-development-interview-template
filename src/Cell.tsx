@@ -17,6 +17,12 @@ export function Cell({ cell, index, onDelete, onSave }: CellProps) {
 
   const hasUnsavedChanges = draftText !== cell.text;
 
+  const handleSave = () => {
+    if (hasUnsavedChanges) {
+      onSave(cell.id, draftText);
+    }
+  };
+
   return (
     <div className="cell">
       <div className="cell-header">
@@ -27,7 +33,7 @@ export function Cell({ cell, index, onDelete, onSave }: CellProps) {
               className="cell-button"
               type="button"
               disabled={!hasUnsavedChanges}
-              onClick={() => onSave(cell.id, draftText)}
+              onClick={handleSave}
             >
               Save
             </button>
@@ -47,6 +53,7 @@ export function Cell({ cell, index, onDelete, onSave }: CellProps) {
           className="cell-input"
           value={draftText}
           onChange={(e) => setDraftText(e.target.value)}
+          onBlur={handleSave}
           spellCheck={false}
         />
       </div>
