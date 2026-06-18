@@ -45,7 +45,7 @@ export function Notebook() {
     void saveCells(newCells);
   }, [cells, saveCells]);
 
-  const saveCellText = useCallback(
+  const updateCellText = useCallback(
     (cellId: string, text: string) => {
       const newCells = cells.map((cell) =>
         cell.id === cellId ? { ...cell, text } : cell
@@ -79,7 +79,7 @@ export function Notebook() {
               cell={cell}
               index={index}
               onDelete={deleteCell}
-              onSave={saveCellText}
+              onSave={updateCellText}
             />
           ))
         )}

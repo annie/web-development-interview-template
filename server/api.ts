@@ -1,9 +1,5 @@
 import cloneDeep from "lodash/cloneDeep.js";
-
-export interface CellData {
-  id: string;
-  text: string;
-}
+import type { CellData } from "../shared/types.js";
 
 const SERVER_DELAY_MS = 200;
 

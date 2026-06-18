@@ -8,5 +8,5 @@
     "strict": false,
     "outDir": "dist/server"
   },
-  "include": ["server/**/*"]
+  "include": ["server/**/*", "shared/**/*"]
 }

@@ -1,7 +1,6 @@
-export interface CellData {
-  id: string;
-  text: string;
-}
+import type { CellData } from "../shared/types";
+
+export type { CellData };
 
 export interface ServerApi {
   getCells: () => Promise<CellData[]>;

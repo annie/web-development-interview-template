@@ -1,5 +1,5 @@
 import type { Response } from "express";
-import type { CellData } from "./api.js";
+import type { CellData } from "../shared/types.js";
 
 const clients = new Map<string, Response>();
 
