@@ -1,5 +1,4 @@
 import cloneDeep from "lodash/cloneDeep.js";
-import { v4 as uuid } from "uuid";
 
 export interface CellData {
   id: string;
@@ -8,12 +7,7 @@ export interface CellData {
 
 const SERVER_DELAY_MS = 200;
 
-let cellData: CellData[] = [
-  {
-    id: uuid(),
-    text: "hello world",
-  },
-];
+let cellData: CellData[] = [];
 
 export function getCells(): Promise<CellData[]> {
   return new Promise((resolve) => {

@@ -49,35 +49,10 @@ body {
   letter-spacing: 0;
 }
 
-.notebook-description {
-  margin-top: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #94a3b8;
-}
-
 .notebook-body {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.notebook-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.notebook-status {
-  min-width: 72px;
-  font-size: 12px;
-  line-height: 1.2;
-  color: #64748b;
-  text-align: right;
-}
-
-.notebook-status-error {
-  color: #b42318;
 }
 
 .notebook-button,
@@ -100,24 +75,8 @@ body {
   color: #fff;
 }
 
-.notebook-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.notebook-button:not(:disabled):hover {
+.notebook-button:hover {
   background: #1d4ed8;
-}
-
-.notebook-button-secondary {
-  align-self: flex-start;
-  background: #fff;
-  color: #475569;
-  border-color: #cbd5e1;
-}
-
-.notebook-button-secondary:hover {
-  background: #f8fafc;
 }
 
 .notebook-placeholder {
@@ -231,17 +190,6 @@ body {
   color: #cbd5e1;
 }
 
-.cell-placeholder-link {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.cell-icon {
-  display: flex;
-  align-items: center;
-  color: #94a3b8;
-}
-
 @media (max-width: 640px) {
   .notebook {
     padding: 32px 16px 48px;
@@ -252,14 +200,6 @@ body {
   .cell-header {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .notebook-actions {
-    justify-content: space-between;
-  }
-
-  .notebook-status {
-    text-align: left;
   }
 
   .cell-controls {
